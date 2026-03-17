@@ -1,0 +1,13 @@
+{
+  "name": "小白聊天助手",
+  "version": "1.0.0",
+  "description": "锤子风格聊天应用 - 通过 WebView 连接 OpenClaw",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo 'Use Android Studio or ./build.sh'",
+    "install-apk": "adb install app/build/outputs/apk/debug/app-debug.apk"
+  },
+  "keywords": ["xiaobai", "chat", "openclaw"],
+  "author": "小白",
+  "license": "MIT"
+}
