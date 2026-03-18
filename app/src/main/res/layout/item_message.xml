@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+    <!-- 机器人消息（左边 - 带头像） -->
+    <LinearLayout
+        android:id="@+id/botMessageLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start"
+        android:visibility="gone"
+        android:paddingLeft="8dp">
+        
+        <!-- 小白头像 -->
+        <ImageView
+            android:id="@+id/botAvatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/avatar_bot"
+            android:scaleType="centerCrop"
+            android:layout_marginRight="8dp"/>
+        
+        <!-- 消息气泡 -->
+        <TextView
+            android:id="@+id/botMessageText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bubble_bot"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:maxWidth="280dp"
+            android:lineSpacingExtra="4dp"/>
+    </LinearLayout>
+
+    <!-- 用户消息（右边 - 带头像） -->
+    <LinearLayout
+        android:id="@+id/userMessageLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:visibility="gone"
+        android:paddingRight="8dp">
+        
+        <!-- 消息气泡 -->
+        <TextView
+            android:id="@+id/userMessageText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bubble_user"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:maxWidth="280dp"
+            android:lineSpacingExtra="4dp"/>
+        
+        <!-- 用户头像 -->
+        <ImageView
+            android:id="@+id/userAvatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/avatar_user"
+            android:scaleType="centerCrop"
+            android:layout_marginLeft="8dp"/>
+    </LinearLayout>
+</LinearLayout>

@@ -1,114 +1,98 @@
 package com.xiaobai.chat;
 
 import android.os.Bundle;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.webkit.CookieManager;
-import android.view.KeyEvent;
+import android.os.Handler;
+import android.os.Looper;
+import android.widget.Button;
+import android.widget.EditText;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * 小白聊天助手 - 主界面
- * 使用 WebView 加载 OpenClaw 网页界面
+ * 小白聊天 - 主界面
+ * 原生聊天界面，微信风格
  */
 public class MainActivity extends AppCompatActivity {
     
-    private WebView webView;
+    // 输入框
+    private EditText inputMessage;
     
-    // ⚠️ 修改这里：你的 OpenClaw 服务器地址
-    // 本地地址：http://127.0.0.1:18789 或 http://localhost:18789
-    // 局域网：http://192.168.x.x:18789
-    private static final String SERVER_URL = "http://127.0.0.1:18789";
+    // 发送按钮
+    private Button sendButton;
+    
+    // 聊天列表
+    private RecyclerView chatRecyclerView;
+    
+    // 消息适配器
+    private MessageAdapter adapter;
+    
+    // 消息列表
+    private List<Message> messageList;
+    
+    // 主线程 Handler
+    private Handler mainHandler;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
         
-        // 创建 WebView 全屏显示
-        webView = new WebView(this);
-        setContentView(webView);
+        // 初始化 Handler
+        mainHandler = new Handler(Looper.getMainLooper());
         
-        // 配置 WebView
-        setupWebView();
+        // 绑定视图组件
+        inputMessage = findViewById(R.id.inputMessage);
+        sendButton = findViewById(R.id.sendButton);
+        chatRecyclerView = findViewById(R.id.chatRecyclerView);
         
-        // 加载服务器
-        webView.loadUrl(SERVER_URL);
+        // 初始化消息列表
+        messageList = new ArrayList<>();
+        adapter = new MessageAdapter(messageList);
+        
+        // 配置 RecyclerView
+        chatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        chatRecyclerView.setAdapter(adapter);
+        
+        // 添加欢迎消息
+        addMessage(Message.TYPE_BOT, "🤖 小白：你好，我是小白！有什么可以帮你的吗？");
+        
+        // 设置发送按钮点击事件
+        sendButton.setOnClickListener(v -> sendMessage());
     }
     
-    private void setupWebView() {
-        WebSettings settings = webView.getSettings();
-        
-        // 启用 JavaScript
-        settings.setJavaScriptEnabled(true);
-        
-        // 启用 DOM 存储
-        settings.setDomStorageEnabled(true);
-        
-        // 启用数据库
-        settings.setDatabaseEnabled(true);
-        
-        // 设置缓存
-        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        
-        // 支持缩放
-        settings.setSupportZoom(true);
-        settings.setBuiltInZoomControls(true);
-        settings.setDisplayZoomControls(false);
-        
-        // 设置 User-Agent（可选，让服务器知道是移动端）
-        settings.setUserAgentString(settings.getUserAgentString() + " XiaoBaiApp/1.0");
-        
-        // 允许文件访问
-        settings.setAllowFileAccess(true);
-        settings.setAllowContentAccess(true);
-        
-        // 启用混合内容（HTTP + HTTPS）
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-        }
-        
-        // 设置 WebViewClient，让链接在 WebView 内打开
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
-            }
-        });
-        
-        // 启用 Cookie
-        CookieManager.getInstance().setAcceptCookie(true);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
+    /**
+     * 发送消息
+     */
+    private void sendMessage() {
+        String message = inputMessage.getText().toString().trim();
+        if (!message.isEmpty()) {
+            // 添加用户消息（右边绿色气泡）
+            addMessage(Message.TYPE_USER, message);
+            
+            // 清空输入框
+            inputMessage.setText("");
+            
+            // 模拟小白回复（延迟 500ms）
+            mainHandler.postDelayed(() -> {
+                addMessage(Message.TYPE_BOT, "🤖 小白：收到你的消息：" + message);
+            }, 500);
         }
     }
     
-    @Override
-    public void onBackPressed() {
-        // 如果 WebView 可以后退，则后退
-        if (webView.canGoBack()) {
-            webView.goBack();
-        } else {
-            super.onBackPressed();
-        }
-    }
-    
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // 处理返回键
-        if (keyCode == KeyEvent.KEYCODE_BACK && webView.canGoBack()) {
-            webView.goBack();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-    
-    @Override
-    protected void onDestroy() {
-        if (webView != null) {
-            webView.destroy();
-        }
-        super.onDestroy();
+    /**
+     * 添加消息到列表
+     * @param type 消息类型（TYPE_USER 或 TYPE_BOT）
+     * @param text 消息内容
+     */
+    private void addMessage(int type, String text) {
+        messageList.add(new Message(type, text));
+        adapter.notifyItemInserted(messageList.size() - 1);
+        // 滚动到底部
+        chatRecyclerView.scrollToPosition(messageList.size() - 1);
     }
 }
